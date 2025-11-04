@@ -57,6 +57,7 @@ int main(int argc, char** argv) {
     TCPReassembly treasm;
     TrafficStats stats;
     Detector detector(stats, frag, treasm, logger);
+    
 
     // NIC 캡처 초기화
     PcapCapture cap(iface);
