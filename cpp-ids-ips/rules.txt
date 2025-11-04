@@ -1,8 +1,0 @@
-# proto,direction,field,value,message
-# proto: tcp|udp|any
-# direction: dst|src|any
-# field: port
-tcp,dst,port,22,SSH access detected
-tcp,dst,port,80,HTTP access detected
-any,any,port,8080,Access to port 8080
-# add new rules and save; RuleLoader watches for changes

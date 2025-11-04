@@ -14,6 +14,6 @@ mkdir build && cd build
 cmake ..
 make -j$(nproc)
 
-sudo ./cpp-ids-ips <interface> <rules_file>
-# example
-sudo ./cpp-ids-ips ens34 ../rules.txt
+# 반드시 NIC 지정 필요
+sudo ./cpp-ids --iface xx
+sudo ./cpp-ids --iface eth0 --alerts /var/log/ids_alerts.jsonl
