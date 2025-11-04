@@ -24,6 +24,7 @@
     <ProjectGuid>{f43f3a68-978d-4e24-a71f-a5191275f551}</ProjectGuid>
     <RootNamespace>cppidsips</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>cpp_ips_ddos</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -141,19 +142,33 @@
     <Text Include="rules.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\flow\FlowDetector.cpp" />
+    <ClCompile Include="src\capture\PcapCapture.cpp" />
+    <ClCompile Include="src\engine\Detector.cpp" />
+    <ClCompile Include="src\engine\FragmentReassembly.cpp" />
+    <ClCompile Include="src\engine\TCPReassembly.cpp" />
+    <ClCompile Include="src\engine\TrafficStats.cpp" />
+    <ClCompile Include="src\logger\LogManager.cpp" />
     <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\rules\RuleLoader.cpp" />
+    <ClCompile Include="src\parser\PacketParser.cpp" />
+    <ClCompile Include="src\utils\ThreadPool.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="fREADME.md">
       <SubType>
       </SubType>
     </None>
+    <None Include="logs\ids_alert.jsonl" />
+    <None Include="rules\example.rules" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\flow\FlowDetector.h" />
-    <ClInclude Include="src\rules\RuleLoader.h" />
+    <ClInclude Include="src\capture\PcapCapture.h" />
+    <ClInclude Include="src\engine\Detector.h" />
+    <ClInclude Include="src\engine\FragmentReassembly.h" />
+    <ClInclude Include="src\engine\TCPReassembly.h" />
+    <ClInclude Include="src\engine\TrafficStats.h" />
+    <ClInclude Include="src\logger\LogManager.h" />
+    <ClInclude Include="src\parser\PacketParser.h" />
+    <ClInclude Include="src\utils\ThreadPool.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

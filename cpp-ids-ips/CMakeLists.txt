@@ -1,24 +1,23 @@
-cmake_minimum_required(VERSION 3.16)
-project(cpp-ids-ips)
-
+cmake_minimum_required(VERSION 3.10)
+project(cpp_ips_ddos)
 set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_BUILD_TYPE Release)
-
-find_package(PCRE2 REQUIRED)
 find_package(PkgConfig REQUIRED)
-pkg_check_modules(NFQ REQUIRED libnetfilter_queue)
+pkg_check_modules(PCAP REQUIRED libpcap)
+include_directories(${PCAP_INCLUDE_DIRS})
+link_directories(${PCAP_LIBRARY_DIRS})
+add_definitions(${PCAP_CFLAGS_OTHER})
 
-include_directories(${NFQ_INCLUDE_DIRS})
-include_directories(${PCRE2_INCLUDE_DIRS})
-include_directories(src)
-
-file(GLOB SOURCES
-    src/main.cpp
-    src/rules/*.cpp
-    src/flow/*.cpp
-    src/nfqueue/*.cpp
-    src/logger/*.cpp
+add_executable(cpp-ips-ddos
+  src/main.cpp
+  src/capture/PcapCapture.cpp
+  src/parser/PacketParser.cpp
+  src/engine/FragmentReassembly.cpp
+  src/engine/TCPReassembly.cpp
+  src/engine/TrafficStats.cpp
+  src/engine/Detector.cpp
+  src/logger/LogManager.cpp
+  src/utils/ThreadPool.cpp
 )
 
-add_executable(cpp-ids-ips ${SOURCES})
-target_link_libraries(cpp-ids-ips ${NFQ_LIBRARIES} ${PCRE2_LIBRARIES} pthread)
+target_include_directories(cpp-ips-ddos PRIVATE src)
+target_link_libraries(cpp-ips-ddos ${PCAP_LIBRARIES})

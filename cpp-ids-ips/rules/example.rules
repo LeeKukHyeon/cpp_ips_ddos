@@ -1,47 +1,22 @@
-# example.rules - Snort/Suricata-like demo rules for PoC
-# 15 rules covering SQLi, XSS, SSH brute, SYN flood (flow), portscan, and other common patterns.
+# example.rules - º¹ÇÕ ·ê + detection_filter/dthreshold examples
 
-# 1 - HTTP SQL Injection (UNION SELECT)
-alert tcp any any -> any 80 (msg:"WEB-ATTACK SQLi - UNION SELECT"; sid:1000001; rev:1; content:"union select"; pcre:"/union\s+select/i"; classtype:web-application-attack; severity:8; action:block_temp;)
+# 1) SQLi PCRE + content (simple)
+alert tcp any any -> any 80 (msg:"SQL Injection attempt"; content:"union select"; pcre:"/union\s+select/i"; sid:1000001;)
 
-# 2 - HTTP SQL Injection (generic SELECT misuse)
-alert tcp any any -> any 80 (msg:"WEB-ATTACK SQLi - SELECT statement"; sid:1000002; rev:1; content:"select "; pcre:"/\bselect\b.*\bfrom\b/i"; classtype:web-application-attack; severity:7; action:alert;)
+# 2) XSS attempt
+alert tcp any any -> any 80 (msg:"XSS attempt"; content:"<script"; pcre:"/<script.*?>/i"; sid:1000002;)
 
-# 3 - XSS attempt in URI or body
-alert tcp any any -> any 80 (msg:"WEB-ATTACK XSS attempt"; sid:1000003; rev:1; content:"<script"; pcre:"/<script.*?>/i"; classtype:web-application-attack; severity:7; action:alert;)
+# 3) SSH banner
+alert tcp any any -> any 22 (msg:"SSH banner detected"; content:"SSH-"; sid:1000003;)
 
-# 4 - SSH brute force (look for failed login pattern; detection_filter used)
-alert tcp any any -> any 22 (msg:"SSH Brute Force - many failures"; sid:1000100; rev:1; content:"Failed password"; detection_filter:track by_src, count 5, seconds 60; classtype:attempted-admin; severity:6; action:alert;)
+# 4) SYN flood threshold (track by_src, threshold type)
+alert tcp any any -> any 80 (msg:"SYN flood (threshold)"; sid:2000001; detection_filter: track by_src, count 5, seconds 2; flags:SYN;)
 
-# 5 - SYN Flood (flow rule; engine should implement threshold)
-flow tcp any any -> any 80 (msg:"SYN Flood"; proto:TCP; flags:SYN; threshold:100; sid:2000001; rev:1; action:block_temp;)
+# 5) HTTP GET flood (limit type) - allow at most 10 alerts per 3s per source
+alert tcp any any -> any 80 (msg:"HTTP GET flood (limit)"; content:"GET "; sid:2000002; detection_filter: track by_src, count 10, seconds 3, type limit;)
 
-# 6 - TCP connect portscan (many different dst ports)
-alert tcp any any -> any any (msg:"TCP Port Scan - many ports"; sid:1000200; rev:1; detection_filter:track by_src, count 20, seconds 60; classtype:attempted-recon; severity:6; action:alert;)
+# 6) HTTP GET flood (both) - require threshold then limit alerts
+alert tcp any any -> any 80 (msg:"HTTP GET flood (both)"; content:"GET "; sid:2000003; detection_filter: track by_src, count 30, seconds 5, type both;)
 
-# 7 - HTTPS SQLi heuristic (uppercase SELECT)
-alert tcp any any -> any 443 (msg:"HTTPS SQLi uppercase SELECT"; sid:1000004; rev:1; content:"SELECT "; pcre:"/SELECT\s+.*FROM/i"; classtype:web-application-attack; severity:6; action:alert;)
-
-# 8 - MySQL injection attempt (payload contains DROP TABLE)
-alert tcp any any -> any 3306 (msg:"MySQL Attack - DROP TABLE"; sid:1000005; rev:1; content:"DROP TABLE"; classtype:database-attack; severity:9; action:block_temp;)
-
-# 9 - FTP login attempt pattern
-alert tcp any any -> any 21 (msg:"FTP Attack - USER command"; sid:1000006; rev:1; content:"USER "; classtype:attempted-admin; severity:5; action:alert;)
-
-# 10 - SMTP suspicious MAIL FROM pattern
-alert tcp any any -> any 25 (msg:"SMTP Spam Attempt - MAIL FROM"; sid:1000007; rev:1; content:"MAIL FROM"; classtype:policy-violation; severity:4; action:alert;)
-
-# 11 - POP3 login patterns
-alert tcp any any -> any 110 (msg:"POP3 Attack - USER command"; sid:1000008; rev:1; content:"USER "; classtype:attempted-admin; severity:5; action:alert;)
-
-# 12 - IMAP login patterns
-alert tcp any any -> any 143 (msg:"IMAP Attack - LOGIN"; sid:1000009; rev:1; content:"LOGIN "; classtype:attempted-admin; severity:5; action:alert;)
-
-# 13 - Telnet brute force-like login attempts
-alert tcp any any -> any 23 (msg:"Telnet Bruteforce attempt"; sid:1000010; rev:1; content:"login"; classtype:attempted-admin; severity:6; action:alert;)
-
-# 14 - DNS ANY amplification indicator (payload includes 'ANY')
-alert udp any any -> any 53 (msg:"DNS ANY Amplification attempt"; sid:1000011; rev:1; content:"ANY "; classtype:attempted-recon; severity:8; action:block_temp;)
-
-# 15 - NTP monlist reflection indicator
-alert udp any any -> any 123 (msg:"NTP monlist reflection attempt"; sid:1000012; rev:1; content:"monlist"; classtype:attempted-recon; severity:8; action:block_temp;)
+# 7) Complex chain
+alert tcp any any -> any 80 (msg:"Complex chain example"; content:"start"; offset:0; depth:80; content:"middle"; distance:1; within:20; content:"end"; sid:9001;)
