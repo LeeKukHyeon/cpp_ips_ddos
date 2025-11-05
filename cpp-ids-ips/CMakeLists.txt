@@ -1,23 +1,20 @@
-cmake_minimum_required(VERSION 3.10)
-project(cpp_ips_ddos)
+cmake_minimum_required(VERSION 3.16)
+project(cpp-ips-ddos)
 set(CMAKE_CXX_STANDARD 17)
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(PCAP REQUIRED libpcap)
-include_directories(${PCAP_INCLUDE_DIRS})
-link_directories(${PCAP_LIBRARY_DIRS})
-add_definitions(${PCAP_CFLAGS_OTHER})
+set(CMAKE_BUILD_TYPE Release)
 
-add_executable(cpp-ips-ddos
-  src/main.cpp
-  src/capture/PcapCapture.cpp
-  src/parser/PacketParser.cpp
-  src/engine/FragmentReassembly.cpp
-  src/engine/TCPReassembly.cpp
-  src/engine/TrafficStats.cpp
-  src/engine/Detector.cpp
-  src/logger/LogManager.cpp
-  src/utils/ThreadPool.cpp
+find_package(Pcap REQUIRED)
+
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+
+file(GLOB SRC
+    src/main.cpp
+    src/capture/*.cpp
+    src/parser/*.cpp
+    src/engine/*.cpp
+    src/logger/*.cpp
+    src/utils/*.cpp
 )
 
-target_include_directories(cpp-ips-ddos PRIVATE src)
-target_link_libraries(cpp-ips-ddos ${PCAP_LIBRARIES})
+add_executable(cpp-ips-ddos ${SRC})
+target_link_libraries(cpp-ips-ddos pcap pthread)

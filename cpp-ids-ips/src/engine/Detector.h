@@ -1,32 +1,32 @@
 #pragma once
-#include "../parser/PacketParser.h"
-#include "TrafficStats.h"
-#include "FragmentReassembly.h"
-#include "TCPReassembly.h"
+#include "../engine/TrafficStats.h"
+#include "../engine/FragmentReassembly.h"
+#include "../engine/TCPReassembly.h"
 #include "../logger/LogManager.h"
-#include <chrono>
+#include "../model/Packet.h"
 #include <unordered_set>
 #include <mutex>
 
 class Detector {
 public:
     Detector(TrafficStats& stats, FragmentReassembly& frag, TCPReassembly& treasm, LogManager& logger);
-    void on_packet(const Packet& p); // pcap 콜백에서 비동기 호출
-    void tick(); // 1초 주기 검사
-    void cleanup(); // 정리 호출
+    // p는 값 복사로 전달(스레드풀 enqueue에서 안전)
+    void on_packet(const Packet& p);
+    void tick();
 private:
     TrafficStats& stats_;
     FragmentReassembly& frag_;
     TCPReassembly& treasm_;
     LogManager& log_;
-    // 정책 임계치 (기본값)
-    uint64_t pps_thresh = 10000;       // pkts per sec per IP
-    uint64_t syn_thresh = 1000;        // syn/sec
-    uint64_t conn_thresh = 500;        // 동시 연결 수
-    uint64_t slowpost_duration = 30;   // 초
-    uint64_t slowpost_bytes_low = 100;
     std::unordered_set<std::string> blocked_;
     std::mutex mtx_;
+
+    // 임계치 (간단한 기본값)
+    uint64_t pps_thresh_ = 10000;
+    uint64_t conn_thresh_ = 500;
+    uint64_t slowpost_dur_ = 30;
+    uint64_t slowpost_bytes_ = 100;
+
     void check_and_block(const std::string& ip, const std::string& reason);
-    void alert(const std::string& json);
+    void alert_json(const std::string& json);
 };

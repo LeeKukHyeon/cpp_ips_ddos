@@ -139,7 +139,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />
-    <Text Include="rules.txt" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\capture\PcapCapture.cpp" />
@@ -158,7 +157,6 @@
       </SubType>
     </None>
     <None Include="logs\ids_alert.jsonl" />
-    <None Include="rules\example.rules" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\capture\PcapCapture.h" />
